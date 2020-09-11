@@ -1,8 +1,6 @@
 use crate::{
-    model::User,
-    schema,
-    schema::users::dsl::users,
-    service::{Error, Service},
+    error::Error, model::User, schema, schema::users::dsl::users,
+    service::Service,
 };
 use async_trait::async_trait;
 use diesel::prelude::*;
@@ -22,7 +20,7 @@ impl ServiceImpl {
 
 pub fn create_service(database_url: String) -> ServiceImpl {
     let manager = ConnectionManager::<PgConnection>::new(database_url);
-    let pool = mobc::Pool::builder().build(manager);
+    let pool = Pool::builder().build(manager);
     ServiceImpl { pool: pool }
 }
 

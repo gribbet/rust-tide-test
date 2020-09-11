@@ -1,8 +1,8 @@
 #[macro_use]
 extern crate diesel;
-extern crate async_trait;
 
 pub mod database;
+pub mod error;
 pub mod model;
 pub mod schema;
 pub mod service;
