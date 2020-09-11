@@ -1,23 +1,25 @@
 use crate::models::User;
 use async_trait::async_trait;
-use core::fmt::Display;
-use diesel::ConnectionError;
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum Error {
-    ConnectionError(ConnectionError),
+    #[error("connection error")]
+    ConnectionError(mobc::Error<mobc_diesel::Error>),
+    #[error("database error")]
+    DatabaseError(diesel::result::Error),
 }
 
-impl Display for Error {
-    fn fmt(
-        &self,
-        _: &mut std::fmt::Formatter<'_>,
-    ) -> std::result::Result<(), std::fmt::Error> {
-        todo!()
+impl From<mobc::Error<mobc_diesel::Error>> for Error {
+    fn from(error: mobc::Error<mobc_diesel::Error>) -> Self {
+        Error::ConnectionError(error)
     }
 }
 
-impl std::error::Error for Error {}
+impl From<diesel::result::Error> for Error {
+    fn from(error: diesel::result::Error) -> Self {
+        Error::DatabaseError(error)
+    }
+}
 
 #[async_trait]
 pub trait UserService: 'static + Sync + Send {

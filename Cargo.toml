@@ -12,3 +12,4 @@ async-std = { version = "1.6.0", features = ["attributes"] }
 serde = "1.0.115"
 mobc = { version = "0.5.12", features = ["async-std"] }
 mobc-diesel = "1.0.0"
+thiserror = "1.0.20"

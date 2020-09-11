@@ -33,18 +33,6 @@ pub fn create_user_service(database_url: String) -> UserServiceImpl {
     UserServiceImpl { pool: pool }
 }
 
-impl From<mobc::Error<mobc_diesel::Error>> for Error {
-    fn from(_: mobc::Error<mobc_diesel::Error>) -> Self {
-        todo!()
-    }
-}
-
-impl From<diesel::result::Error> for Error {
-    fn from(_: diesel::result::Error) -> Self {
-        todo!()
-    }
-}
-
 #[async_trait]
 impl UserService for UserServiceImpl {
     async fn create(&self, user: User) -> Result<User, Error> {
