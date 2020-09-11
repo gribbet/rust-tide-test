@@ -1,4 +1,4 @@
-use crate::{model::User, service::Service};
+use crate::{model::CreateUser, service::Service};
 use tide::{Body, Request, Response, Server};
 
 #[derive(Clone)]
@@ -17,7 +17,7 @@ async fn get_users<S: Service>(
 async fn post_user<S: Service>(
     mut request: Request<State<S>>,
 ) -> Result<impl Into<Response>, tide::Error> {
-    let user: User = request.body_json().await?;
+    let user: CreateUser = request.body_json().await?;
     let user = request.state().service.create_user(user).await?;
     let mut response = Response::new(201);
     response.set_body(Body::from_json(&user)?);

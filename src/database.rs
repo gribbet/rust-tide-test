@@ -1,5 +1,8 @@
 use crate::{
-    error::Error, model::User, schema, schema::users::dsl::users,
+    error::Error,
+    model::{CreateUser, User},
+    schema,
+    schema::users::dsl::users,
     service::Service,
 };
 use async_trait::async_trait;
@@ -26,7 +29,7 @@ pub fn create_service(database_url: String) -> ServiceImpl {
 
 #[async_trait]
 impl Service for ServiceImpl {
-    async fn create_user(&self, user: User) -> Result<User, Error> {
+    async fn create_user(&self, user: CreateUser) -> Result<User, Error> {
         Ok(diesel::insert_into(schema::users::table)
             .values(&user)
             .get_result(&self.connection().await?)?)
