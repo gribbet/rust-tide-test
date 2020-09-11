@@ -25,15 +25,22 @@ async fn get_user<S: Service>(request: Request<State<S>>) -> tide::Result {
         .param("id")
         .map_err(|error| tide::Error::new(StatusCode::NotFound, error))?;
     let service = &request.state().service;
-    let users = service.get_user(id).await?;
-    Ok(Response::from(Body::from_json(&users)?))
+    let user = service.get_user(id).await?;
+    Ok(match user {
+        Some(user) => Response::from(Body::from_json(&user)?),
+        None => Response::new(StatusCode::NotFound),
+    })
 }
 
 pub fn create_app<S: Service>(service: S) -> Server<State<S>> {
     let state = State { service: service };
-    let mut app = tide::with_state(state);
-    app.at("/users").post(post_user);
-    app.at("/users").get(get_users);
-    app.at("/users/:id").get(get_user);
+    let mut app = tide::with_state(state.clone());
+    app.at("/users").nest({
+        let mut app = tide::with_state(state);
+        app.at("/").post(post_user);
+        app.at("/").get(get_users);
+        app.at("/:id").get(get_user);
+        app
+    });
     app
 }
