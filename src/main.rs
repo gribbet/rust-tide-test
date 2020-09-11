@@ -1,6 +1,6 @@
 extern crate rust_tide_test;
 
-use rust_tide_test::{create_service, web::create_app};
+use rust_tide_test::{database::create_service, web::create_app};
 use std::env;
 
 #[async_std::main]

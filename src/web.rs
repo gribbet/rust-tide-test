@@ -1,4 +1,4 @@
-use crate::{service, User};
+use crate::{model::User, service};
 use tide::{Body, Request, Response, Server};
 
 #[derive(Clone)]
