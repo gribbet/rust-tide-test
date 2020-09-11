@@ -1,4 +1,4 @@
-use crate::models::User;
+use crate::model::User;
 use async_trait::async_trait;
 
 #[derive(Debug, thiserror::Error)]
@@ -22,7 +22,7 @@ impl From<diesel::result::Error> for Error {
 }
 
 #[async_trait]
-pub trait UserService: 'static + Sync + Send {
-    async fn create(&self, user: User) -> Result<User, Error>;
-    async fn list(&self) -> Result<Vec<User>, Error>;
+pub trait Service: 'static + Sync + Send + Clone {
+    async fn create_user(&self, user: User) -> Result<User, Error>;
+    async fn list_users(&self) -> Result<Vec<User>, Error>;
 }
