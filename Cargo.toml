@@ -1,0 +1,9 @@
+[package]
+name = "rust-tide-test"
+version = "0.1.0"
+authors = ["Graham <graham.gibbons@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+tide = "0.13.0"
+async-std = { version = "1.6.0", features = ["attributes"] }
