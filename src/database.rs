@@ -35,6 +35,14 @@ impl Service for ServiceImpl {
             .get_result(&self.connection().await?)?)
     }
 
+    async fn get_user(&self, user_id: i32) -> Result<Option<User>, Error> {
+        use schema::users::dsl::*;
+        Ok(users
+            .filter(id.eq(user_id))
+            .first(&self.connection().await?)
+            .optional()?)
+    }
+
     async fn list_users(&self) -> Result<Vec<User>, Error> {
         Ok(users.load::<User>(&self.connection().await?)?)
     }
