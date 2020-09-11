@@ -6,22 +6,16 @@ pub struct State<S: Service> {
     service: S,
 }
 
-async fn get_users<S: Service>(
-    request: Request<State<S>>,
-) -> Result<impl Into<Response>, tide::Error> {
+async fn get_users<S: Service>(request: Request<State<S>>) -> tide::Result {
     let service = &request.state().service;
     let users = service.list_users().await?;
-    Ok(Body::from_json(&users)?)
+    Ok(Response::from(Body::from_json(&users)?))
 }
 
-async fn post_user<S: Service>(
-    mut request: Request<State<S>>,
-) -> Result<impl Into<Response>, tide::Error> {
+async fn post_user<S: Service>(mut request: Request<State<S>>) -> tide::Result {
     let user: CreateUser = request.body_json().await?;
     let user = request.state().service.create_user(user).await?;
-    let mut response = Response::new(201);
-    response.set_body(Body::from_json(&user)?);
-    Ok(response)
+    Ok(Response::builder(201).body(Body::from_json(&user)?).build())
 }
 
 pub fn create_app<S: Service>(service: S) -> Server<State<S>> {
