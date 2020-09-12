@@ -1,5 +1,5 @@
 use crate::{
-    endpoint::{get_user, get_users, post_user},
+    endpoint::{delete_user, get_user, get_users, post_user},
     service::Service,
 };
 use async_std::sync::Arc;
@@ -24,6 +24,7 @@ impl Api {
             app.at("/").post(post_user);
             app.at("/").get(get_users);
             app.at("/:id").get(get_user);
+            app.at("/:id").delete(delete_user);
             app
         });
         Api { app }

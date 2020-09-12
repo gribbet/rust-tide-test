@@ -26,3 +26,15 @@ pub async fn get_user(request: Request<State>) -> tide::Result {
         None => Response::new(StatusCode::NotFound),
     })
 }
+
+pub async fn delete_user(request: Request<State>) -> tide::Result {
+    let id: i32 = request
+        .param("id")
+        .map_err(|error| tide::Error::new(StatusCode::NotFound, error))?;
+    let service = request.state().service.clone();
+    let deleted = service.delete_user(id).await?;
+    Ok(match deleted {
+        true => Response::new(StatusCode::NoContent),
+        false => Response::new(StatusCode::NotFound),
+    })
+}

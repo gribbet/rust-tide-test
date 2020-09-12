@@ -35,6 +35,10 @@ impl Service for MockService {
         Ok(user)
     }
 
+    async fn list_users(&self) -> Result<Vec<User>, Error> {
+        Ok(self.users.clone().read().await.clone())
+    }
+
     async fn get_user(&self, user_id: i32) -> Result<Option<User>, Error> {
         Ok(self
             .users
@@ -46,7 +50,11 @@ impl Service for MockService {
             .map(|user| user.clone()))
     }
 
-    async fn list_users(&self) -> Result<Vec<User>, Error> {
-        Ok(self.users.clone().read().await.clone())
+    async fn delete_user(&self, user_id: i32) -> Result<bool, Error> {
+        let users = self.users.clone();
+        let mut users = users.write().await;
+        let exists = users.iter().find(|user| user.id == user_id).is_some();
+        users.retain(|user| user.id != user_id);
+        Ok(exists)
     }
 }

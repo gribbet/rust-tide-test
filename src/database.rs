@@ -35,6 +35,10 @@ impl Service for DatabaseService {
             .get_result(&self.connection().await?)?)
     }
 
+    async fn list_users(&self) -> Result<Vec<User>, Error> {
+        Ok(users.load::<User>(&self.connection().await?)?)
+    }
+
     async fn get_user(&self, user_id: i32) -> Result<Option<User>, Error> {
         use schema::users::dsl::*;
         Ok(users
@@ -43,7 +47,10 @@ impl Service for DatabaseService {
             .optional()?)
     }
 
-    async fn list_users(&self) -> Result<Vec<User>, Error> {
-        Ok(users.load::<User>(&self.connection().await?)?)
+    async fn delete_user(&self, user_id: i32) -> Result<bool, Error> {
+        use schema::users::dsl::*;
+        Ok(diesel::delete(users.filter(id.eq(user_id)))
+            .execute(&self.connection().await?)?
+            > 0)
     }
 }
