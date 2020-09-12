@@ -1,15 +1,20 @@
 extern crate rust_tide_test;
 
-use rust_tide_test::{api::Api, database::DatabaseService, mock::MockService};
+use async_std::sync::Arc;
+use rust_tide_test::{
+    api::Api, database::DatabaseService, mock::MockService, service::Service,
+};
 use std::env;
 
 #[async_std::main]
 async fn main() -> Result<(), std::io::Error> {
     tide::log::start();
     let database_url = env::var("DATABASE_URL").map(Some).unwrap_or(None);
-    match database_url {
-        Some(url) => Api::new(DatabaseService::new(url)).listen().await?,
-        None => Api::new(MockService::new()).listen().await?,
-    }
+    let service: Arc<dyn Service> = match database_url {
+        Some(url) => Arc::new(DatabaseService::new(url)),
+        None => Arc::new(MockService::new()),
+    };
+    let api = Api::new(service);
+    api.listen().await?;
     Ok(())
 }

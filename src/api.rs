@@ -2,20 +2,21 @@ use crate::{
     endpoint::{get_user, get_users, post_user},
     service::Service,
 };
+use async_std::sync::Arc;
 use std::io;
 use tide::Server;
 
 #[derive(Clone)]
-pub struct State<S: Service> {
-    pub service: S,
+pub struct State {
+    pub service: Arc<dyn Service>,
 }
 
-pub struct Api<S: Service> {
-    app: Server<State<S>>,
+pub struct Api {
+    app: Server<State>,
 }
 
-impl<S: Service> Api<S> {
-    pub fn new(service: S) -> Self {
+impl Api {
+    pub fn new(service: Arc<dyn Service>) -> Self {
         let state = State { service: service };
         let mut app = tide::with_state(state.clone());
         app.at("/users").nest({
