@@ -11,24 +11,24 @@ use mobc::Pool;
 use mobc_diesel::ConnectionManager;
 
 #[derive(Clone)]
-pub struct ServiceImpl {
+pub struct DatabaseService {
     pool: Pool<ConnectionManager<PgConnection>>,
 }
 
-impl ServiceImpl {
+impl DatabaseService {
+    pub fn new(url: String) -> Self {
+        let manager = ConnectionManager::<PgConnection>::new(url);
+        let pool = Pool::builder().build(manager);
+        DatabaseService { pool: pool }
+    }
+
     async fn connection(&self) -> Result<PgConnection, Error> {
         Ok(self.pool.get().await?.into_inner())
     }
 }
 
-pub fn create_service(database_url: String) -> ServiceImpl {
-    let manager = ConnectionManager::<PgConnection>::new(database_url);
-    let pool = Pool::builder().build(manager);
-    ServiceImpl { pool: pool }
-}
-
 #[async_trait]
-impl Service for ServiceImpl {
+impl Service for DatabaseService {
     async fn create_user(&self, user: CreateUser) -> Result<User, Error> {
         Ok(diesel::insert_into(schema::users::table)
             .values(&user)
