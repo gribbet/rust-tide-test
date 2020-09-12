@@ -3,9 +3,9 @@ use crate::{
     model::{CreateUser, User},
     service::Service,
 };
+use async_std::sync::{Arc, RwLock};
 use async_trait::async_trait;
 use core::cmp::max;
-use std::sync::{Arc, RwLock};
 
 #[derive(Clone)]
 pub struct MockService {
@@ -24,7 +24,7 @@ impl MockService {
 impl Service for MockService {
     async fn create_user(&self, user: CreateUser) -> Result<User, Error> {
         let users = self.users.clone();
-        let mut users = users.write().unwrap();
+        let mut users = users.write().await;
         let next_id =
             users.iter().map(|user| user.id).fold(0, |x, y| max(x, y)) + 1;
         let user = User {
@@ -40,13 +40,13 @@ impl Service for MockService {
             .users
             .clone()
             .read()
-            .unwrap()
+            .await
             .iter()
             .find(|user| user.id == user_id)
             .map(|user| user.clone()))
     }
 
     async fn list_users(&self) -> Result<Vec<User>, Error> {
-        Ok(self.users.clone().read().unwrap().clone())
+        Ok(self.users.clone().read().await.clone())
     }
 }
